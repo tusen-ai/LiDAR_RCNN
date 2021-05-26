@@ -75,7 +75,7 @@ Our model achieves the following performance on:
 | Proposals from                                               | Class   | Channel | 3D AP L1 Vehicle | 3D AP L1 Pedestrian | 3D AP L1 Cyclist |
 | ------------------------------------------------------------ | ------- | :-----: | :--------------: | :-----------------: | :--------------: |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   1x    |       75.6       |          -          |        -         |
-| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   2x    |       75.6       |          -          |                  |
+| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   2x    |       75.6       |          -          |        -         |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1x    |       73.4       |        70.7         |       67.4       |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   2x    |       73.8       |        71.9         |       69.4       |
 
