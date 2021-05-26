@@ -1,0 +1,7 @@
+numpy
+torch>=1.5
+tensorboardX
+easydict
+pyyaml
+tqdm
+tfrecord

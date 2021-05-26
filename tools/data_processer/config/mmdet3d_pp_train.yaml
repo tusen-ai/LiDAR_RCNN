@@ -1,0 +1,9 @@
+num_process: 10
+pc_path: ./waymo/waymo_format/training_new/pc/
+data_path: ./mmdetection3d/results/waymo-car/kitti_results_train.bin
+gt_path: ./waymo/waymo_format/training_new/gt
+target_path: ../../datasets/mmdet3d_pp
+mode: train
+expand_proposal_meter: 3
+
+

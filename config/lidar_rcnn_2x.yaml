@@ -1,0 +1,42 @@
+CUDNN:
+  BENCHMARK: true
+  DETERMINISTIC: false
+  ENABLED: true
+nGPUS: 4
+OUTPUT_DIR: 'outputs'
+LOG_DIR: 'log'
+WORKERS: 8
+PRINT_FREQ: 100
+
+DATASET: 'waymo.loader'
+MODEL:
+  NAME: 'PointNet'
+  REG_NUM: 7
+  CLS_NUM: 2
+  PTS_DIM: 9
+  X: 2
+
+TRAIN:
+  NUM_POINTS: 512
+  BATCH_SIZE_PER_GPU: 256
+  BEGIN_EPOCH: 0
+  END_EPOCH: 60
+  RESUME: False
+  PRETRAIN: False
+  MODEL_PATH: ''
+  DATA_PATH: './datasets/mmdet3d_pp'
+  OPTIMIZER: sgd
+  LR: 0.02
+  WD: 0.0005
+  MOMENTUM: 0.9
+  NESTEROV: false
+  LOSS_WEIGHT: 20
+  SUFFLE_SIZE: 16384
+  IOU_THRESHOLD: [1, 0.7, 0.5, 1, 0.5]
+  VALID_CLS: [0, 1]
+TEST:
+  WORKERS: 2
+  NUM_POINTS: 512
+  BATCH_SIZE_PER_GPU: 256
+  TAT_PATH: 'results/'
+  FILE_NAME: 'val'
