@@ -4,6 +4,8 @@
 
 This is the official code of [LiDAR R-CNN: An Efficient and Universal 3D Object Detector](https://arxiv.org/abs/2103.15297). In this work, we present LiDAR R-CNN, a second stage detector that can generally improve any existing 3D detector. We find a common problem in Point-based RCNN, which is the learned features ignore the size of proposals, and propose several methods to remedy it. Evaluated on WOD benchmarks, our method significantly outperforms previous state-of-the-art.
 
+中文介绍：https://zhuanlan.zhihu.com/p/359800738
+
 ## Requirements
 
  All the codes are tested in the following environment:
