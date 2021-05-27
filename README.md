@@ -34,6 +34,7 @@ pip install -r requirements.txt
 Install `LiDAR_RCNN` library:
 
 ```python
+apt-get install ninja-build
 python setup.py develop --user
 ```
 
