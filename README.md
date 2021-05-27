@@ -29,12 +29,12 @@ To install requirements:
 
 ```shell
 pip install -r requirements.txt
+apt-get install ninja-build
 ```
 
 Install `LiDAR_RCNN` library:
 
 ```python
-apt-get install ninja-build
 python setup.py develop --user
 ```
 
