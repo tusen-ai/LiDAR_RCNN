@@ -29,7 +29,7 @@ To install requirements:
 
 ```shell
 pip install -r requirements.txt
-apt-get install ninja-build
+apt-get install ninja-build libeigen3-dev
 ```
 
 Install `LiDAR_RCNN` library:
