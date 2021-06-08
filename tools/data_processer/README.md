@@ -28,24 +28,29 @@ After that, you can follow the [Tutorial](https://github.com/open-mmlab/mmdetect
 
 Regarding **training set**, we provide some tricky solutions. Maybe there are more reasonable way.
 
-Firstly, we modify the codes in  [mmdet3D](https://github.com/open-mmlab/mmdetection3d), and run above inference command.
+Firstly, we modify the codes in  [mmdet3D(v0.13.0)](https://github.com/open-mmlab/mmdetection3d/tree/v0.13.0)
 
 ```python
 ./configs/_base_/datasets/waymoD5-3d-car.py
-Line 107 - ann_file=data_root + 'waymo_infos_val.pkl',
-Line 107 + ann_file=data_root + 'waymo_infos_train.pkl',
+Line 135 - ann_file=data_root + 'waymo_infos_val.pkl',
+Line 135 + ann_file=data_root + 'waymo_infos_train.pkl',
 
 ./mmdet3d/core/evaluation/waymo_utils/prediction_kitti_to_waymo.py
-Line 179 - filename = f'{self.prefix}{file_idx:03d}{frame_num:03d}'
-Line 179 + filename = f'{file_idx}{frame_num:03d}'
+Line 182 - filename = f'{self.prefix}{file_idx:03d}{frame_num:03d}'
+Line 182 + filename = f'{file_idx}{frame_num:03d}'
 
 ./mmdet3d/datasets/waymo_dataset.py
-Line 188 - waymo_tfrecords_dir = osp.join(waymo_root, 'validation')
-Line 189 - prefix = '1'
-Line 188 + waymo_tfrecords_dir = osp.join(waymo_root, 'training')
-Line 189 + prefix = '0'
+Line 191 - waymo_tfrecords_dir = osp.join(waymo_root, 'validation')
+Line 192 - prefix = '1'
+Line 191 + waymo_tfrecords_dir = osp.join(waymo_root, 'training')
+Line 192 + prefix = '0'
 ```
-
+and run
+```
+./tools/dist_test.sh configs/pointpillars/hv_pointpillars_secfpn_sbn_2x16_2x_waymo-3d-car.py checkpoints/hv_pointpillars_secfpn_sbn_2x16_2x_waymo-3d-car-9fa20624.pth 8 --out results/waymo-pp-car/results_eval.pkl \
+    --format-only --options 'pklfile_prefix=results/waymo-pp-car/kitti_results_train' \
+    'submission_prefix=results/waymo-pp-car/kitti_results_train'
+```
 Subsequently, set your data path in config and run ```data_processer.py ```
 
 ```yaml
