@@ -24,7 +24,7 @@ TRAIN:
   RESUME: False
   PRETRAIN: False
   MODEL_PATH: ''
-  DATA_PATH: './dataset/waymo_mmdet_pp_3class' 
+  DATA_PATH: './datasets/mmdet3d_pp_3class' 
   OPTIMIZER: sgd
   LR: 0.02
   WD: 0.0005
