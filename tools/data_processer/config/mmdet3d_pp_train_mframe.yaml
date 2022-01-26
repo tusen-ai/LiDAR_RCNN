@@ -1,0 +1,10 @@
+num_process: 10
+pc_path: /mnt/truenas/scratch/zhichao.li/workspace/mmdetection3d/data/waymo/waymo_format/training_new/pc/
+data_path: /mnt/truenas/scratch/zhichao.li/workspace/mmdetection3d/results/waymo-car/kitti_results_train.bin
+gt_path: /mnt/truenas/scratch/zhichao.li/workspace/mmdetection3d/data/waymo/waymo_format/training_new/gt
+target_path: ../../datasets/mmdet3d_5_frame
+mode: train
+expand_proposal_meter: 3
+nframe: 5
+
+

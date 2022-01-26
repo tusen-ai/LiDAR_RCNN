@@ -15,6 +15,7 @@ class TFRecordDataset(torch.utils.data.IterableDataset):
                  index_path: typing.Union[str, None],
                  description: typing.Union[typing.List[str], typing.Dict[str, str], None] = None,
                  points_num: typing.Optional[int] = 512,
+                 frame: typing.Optional[int] = 1,
                  iou_threshold: typing.Optional[typing.List[str]] = [0.7],
                  valid_cls: typing.Optional[typing.List[int]] = [0, 1],
                  shuffle_queue_size: typing.Optional[int] = None,
@@ -32,6 +33,7 @@ class TFRecordDataset(torch.utils.data.IterableDataset):
         self.train = train
         self.world_size = world_size
         self.iou_threshold = iou_threshold
+        self.frame = frame
         self.valid_cls = valid_cls
         self.transform = self.transform_train if self.train else self.transform_test
 
@@ -51,33 +53,42 @@ class TFRecordDataset(torch.utils.data.IterableDataset):
         return it
 
     def transform_train(self, it):
-        pcd, proposal, gt_box, gt_cls = load_data(it)
+        pcd_cur, pcd_pre, proposal, gt_box, gt_cls = load_data(it, self.frame)
+        valid_mask = gt_cls
         if gt_cls == 1:
             # only use jitter for vechile
             proposal = jitter(proposal, 0.5)
 
         gt_cls = relabel_by_iou(proposal, gt_box, gt_cls, self.iou_threshold)
         # set proposals without points as nagtive
-        if pcd.shape[0] == 0:
-            gt_cls = 0  
-        point_set = process_pcd(pcd, proposal, self.points_num)
 
+        point_set_cur = process_pcd(pcd_cur, proposal, self.points_num)
+        point_set_pre = process_pcd(pcd_pre, proposal, self.points_num)
+        point_set = np.vstack([point_set_cur, point_set_pre])
+        if point_set.shape[0] == 0:
+            gt_cls = 0
         # heading residual
         gt_box[-1] = get_heading_residual(gt_box[-1], proposal[-1])
 
         # disable other cls
+        # FIXME: should filter cls when data processing
         if gt_cls not in self.valid_cls:
             gt_cls = 0
 
         # move gt box to pred center
         gt_box[:3] -= proposal[:3]
         gt_box[:2] = rotz(-proposal[-1]) @ gt_box[:2]
+
+        point_set = point_set.transpose([1, 0])
         return point_set.astype(np.float32), proposal.astype(np.float32), gt_cls, gt_box.astype(np.float32)
 
     def transform_test(self, it):
         name = "".join([chr(item) for item in it['name']])
-        pcd, proposal, gt_box, gt_cls = load_data(it)
-        point_set = process_pcd(pcd, proposal, self.points_num)
+        pcd_cur, pcd_pre, proposal, gt_box, gt_cls = load_data(it, self.frame)
+        point_set_cur = process_pcd(pcd_cur, proposal, self.points_num)
+        point_set_pre = process_pcd(pcd_pre, proposal, self.points_num)
+        point_set = np.vstack([point_set_cur, point_set_pre])
+        point_set = point_set.transpose([1, 0])
         return point_set.astype(np.float32), proposal.astype(np.float32), name
 
     

@@ -23,6 +23,7 @@ data_list = []
 for key in tqdm(outputs_dict):
     outputs_dict[key].update(gt_dict[key])
     outputs_dict[key]['expand_proposal_meter'] = cfg.expand_proposal_meter
+    outputs_dict[key]['nframe'] = cfg.nframe
     data_list.append(outputs_dict[key])
 
 # It's essential for tfrecord.

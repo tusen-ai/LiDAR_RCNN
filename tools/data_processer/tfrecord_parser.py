@@ -54,11 +54,17 @@ def pb2dict(obj):
     return adict
 
 
-def bbox_dict2array(box_dict):
+def bbox_dict2array(box_dict, metadata_dict):
     """transform box dict in waymo_open_format to array
     Args:
         box_dict ([dict]): waymo_open_dataset formatted bbox
     """
+    speed_key = ['speed_x', 'speed_y', 'accel_x', 'accel_y']
+    for key in speed_key:
+        if key not in metadata_dict:
+            print(metadata_dict)
+            metadata_dict[key] = 0
+
     result = np.array([
         box_dict['center_x'],
         box_dict['center_y'],
@@ -67,6 +73,10 @@ def bbox_dict2array(box_dict):
         box_dict['width'],
         box_dict['height'],
         box_dict['heading'],
+        metadata_dict['speed_x'],
+        metadata_dict['speed_y'],
+        metadata_dict['accel_x'],
+        metadata_dict['accel_y'],
     ])
     return result
 
@@ -86,16 +96,20 @@ def main(data_folder, output_folder, multi_process_token=(0, 1)):
         frame_num = 0
         pcs = dict()
         gt_info = dict()
+        tss = []
         for data in dataset:
             frame = open_dataset.Frame()
             frame.ParseFromString(bytearray(data.numpy()))
             context = frame.context.name
             ts = frame.timestamp_micros
+            tss.append(ts)
+            pose = np.array(frame.pose.transform).reshape(4,4)
             # name = str(context) + '/' + str(ts)
      
             # extract the points
             (range_images, camera_projections, range_image_top_pose) = \
                 frame_utils.parse_range_image_and_camera_projection(frame)
+            # 3d points in vehicle frame. 
             points, cp_points = frame_utils.convert_range_image_to_point_cloud(
                 frame, range_images, camera_projections, range_image_top_pose, ri_index=0)
             points_ri2, cp_points_ri2 = frame_utils.convert_range_image_to_point_cloud(
@@ -111,13 +125,15 @@ def main(data_folder, output_folder, multi_process_token=(0, 1)):
             for laser_label in laser_labels:
                 id = laser_label.id
                 box = laser_label.box
+                metadata = laser_label.metadata
+                metadata_dict = pb2dict(metadata)
                 box_dict = pb2dict(box)
-                box_array = bbox_dict2array(box_dict)
+                box_array = bbox_dict2array(box_dict, metadata_dict)
                 frame_boxes.append(box_array[np.newaxis, :])
                 frame_ids.append(id)
                 frame_types.append(laser_label.type)
                 frame_nums.append(laser_label.num_lidar_points_in_box)
-            gt_info = {'boxes': frame_boxes, 'ids': frame_ids, 'types': frame_types, 'pts_nums': frame_nums}
+            gt_info = {'boxes': frame_boxes, 'ids': frame_ids, 'types': frame_types, 'pts_nums': frame_nums, 'pose': pose,'tss':tss[-10:]}
 
             frame_num += 1
             if frame_num % 10 == 0:
