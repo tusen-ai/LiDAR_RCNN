@@ -5,5 +5,5 @@ gt_path: ./waymo/waymo_format/validation_new/gt
 target_path: ../../datasets/mmdet3d_pp_3class
 mode: val
 expand_proposal_meter: 3
-
+nframe: 1
 

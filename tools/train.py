@@ -65,7 +65,7 @@ BaseDataset = importlib.import_module("LiDAR_RCNN.datasets." + cfg.DATASET).TFRe
 tfrecord_path = os.path.join(cfg.TRAIN.DATA_PATH, 'train.rec')
 index_path = os.path.join(cfg.TRAIN.DATA_PATH, 'train.idx')
 description = {"name": "byte", "data": "byte"}
-train_dataset = BaseDataset(get_world_size(), tfrecord_path, index_path, description, points_num=cfg.TRAIN.NUM_POINTS, shuffle_queue_size=cfg.TRAIN.SUFFLE_SIZE, rank=args.local_rank, train=True, iou_threshold=cfg.TRAIN.IOU_THRESHOLD, valid_cls=cfg.TRAIN.VALID_CLS)
+train_dataset = BaseDataset(get_world_size(), tfrecord_path, index_path, description, points_num=cfg.TRAIN.NUM_POINTS, frame=cfg.MODEL.Frame, shuffle_queue_size=cfg.TRAIN.SUFFLE_SIZE, rank=args.local_rank, train=True, iou_threshold=cfg.TRAIN.IOU_THRESHOLD, valid_cls=cfg.TRAIN.VALID_CLS)
 
 trainloader = torch.utils.data.DataLoader(
         train_dataset,
@@ -81,7 +81,7 @@ model = FullModel(model, cfg)
 model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
 model = model.to(device)
 model = nn.parallel.DistributedDataParallel(
-model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
+model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=False)
 
 # optimizer
 if cfg.TRAIN.OPTIMIZER == 'sgd':
@@ -107,6 +107,13 @@ with open(index_path, 'r') as f:
     DATA_LEN = len(f.readlines())
 epoch_iters = np.int(DATA_LEN /
                 cfg.TRAIN.BATCH_SIZE_PER_GPU / cfg.nGPUS)
+
+scheduler  = torch.optim.lr_scheduler.OneCycleLR(
+                                optimizer,
+                                max_lr = cfg.TRAIN.LR,
+                                steps_per_epoch = epoch_iters,
+                                epochs = cfg.TRAIN.END_EPOCH,
+                            )
 
 start = timeit.default_timer()
 end_epoch = cfg.TRAIN.END_EPOCH
@@ -136,7 +143,7 @@ if cfg.TRAIN.PRETRAIN:
 for epoch in range(last_epoch, end_epoch):
     train(cfg, epoch, cfg.TRAIN.END_EPOCH,
             epoch_iters, cfg.TRAIN.LR, num_iters,
-            trainloader, optimizer, model, writer_dict, device, final_output_dir)
+            trainloader, optimizer, scheduler, model, writer_dict, device, final_output_dir)
     if args.local_rank == 0 and epoch % 2 != 0:
         logger.info('=> saving checkpoint to {}'.format(
                 os.path.join(final_output_dir,'checkpoint_{}_{}.pth.tar'.format(args.name, epoch))))

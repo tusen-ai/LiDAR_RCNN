@@ -8,7 +8,7 @@
 
 MatrixXb extract_points(const py::EigenDRef<Eigen::MatrixXf> pc,
                         const py::EigenDRef<Eigen::VectorXf> bbox,
-                        float expand, bool canonic) {
+                        float expand_x, float expand_y, bool canonic) {
   int pc_num = pc.rows();
   float yaw = bbox(4);
   float cos_yaw = std::cos(yaw);
@@ -19,7 +19,7 @@ MatrixXb extract_points(const py::EigenDRef<Eigen::MatrixXf> pc,
     float r_x = (pc(i, 0) - bbox(0)) * cos_yaw + (pc(i, 1) - bbox(1)) * sin_yaw;
     float r_y = (pc(i, 0) - bbox(0)) * (-sin_yaw) + (pc(i, 1) - bbox(1)) * cos_yaw;
     //&& (pc(i, 2) < 2.0f)
-    if ((std::abs(r_x) < bbox(2)/2 + expand/2) && (std::abs(r_y) < bbox(3)/2 + expand/2)) {
+    if ((std::abs(r_x) < bbox(2)/2 + expand_x/2) && (std::abs(r_y) < bbox(3)/2 + expand_y/2)) {
       valid_mask(i, 0) = true;
     }
     else{

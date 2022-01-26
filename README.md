@@ -6,6 +6,10 @@ This is the official code of [LiDAR R-CNN: An Efficient and Universal 3D Object 
 
 中文介绍：https://zhuanlan.zhihu.com/p/359800738
 
+## News
+
+- We provide the training code for multi-frame setting, and show 3 frame results based PointPillars.
+
 ## Requirements
 
  All the codes are tested in the following environment:
@@ -38,6 +42,12 @@ Install `LiDAR_RCNN` library:
 python setup.py develop --user
 ```
 
+Cuda Extensions:
+```shell
+# Rotated IOU
+cd src/LiDAR_RCNN/ops/
+python setup.py build_ext --inplace
+```
 ## Preparing Data
 
 Please refer to [data processer](tools/data_processer/README.md) to generate the proposal data.
@@ -58,6 +68,7 @@ python -m torch.distributed.launch --nproc_per_node=8 tools/train.py --cfg confi
 
 The models and logs will  be saved to `work_dirs/outputs`. 
 
+NOTE: for multi-frame training, please set `MODEL.Frame = n` in config.
 ## Evaluation
 
 To evaluate, run distributed testing with 4 gpus:
@@ -75,19 +86,23 @@ Our model achieves the following performance on:
 
 [Waymo Open Dataset Challenges (3D Detection)](https://waymo.com/open/challenges/2020/3d-detection/)
 
-| Proposals from                                               | Class   | Channel | 3D AP L1 Vehicle | 3D AP L1 Pedestrian | 3D AP L1 Cyclist |
+| Proposals from                                               | Class   | Frame/Channel | 3D AP L1 Vehicle | 3D AP L1 Pedestrian | 3D AP L1 Cyclist |
 | ------------------------------------------------------------ | ------- | :-----: | :--------------: | :-----------------: | :--------------: |
-| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   1x    |       75.6       |          -          |        -         |
-| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   2x    |       75.6       |          -          |        -         |
-| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1x    |       73.4       |        70.7         |       67.4       |
-| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   2x    |       73.8       |        71.9         |       69.4       |
+| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   1 / 1x    |       75.6       |          -          |        -         |
+| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   1 / 2x    |       75.6       |          -          |        -         |
+| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   3 / 2x    |       77.8       |          -          |        -         |
+| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1 / 1x    |       73.4       |        70.7         |       67.4       |
+| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1 / 2x    |       73.8       |        71.9         |       69.4       |
 
-| Proposals from                                               | Class   | Channel | 3D AP L2 Vehicle | 3D AP L2 Pedestrian | 3D AP L2 Cyclist |
+| Proposals from                                               | Class   | Frame/Channel | 3D AP L2 Vehicle | 3D AP L2 Pedestrian | 3D AP L2 Cyclist |
 | ------------------------------------------------------------ | ------- | :-----: | :--------------: | :-----------------: | :--------------: |
-| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   1x    |       66.8       |          -          |        -         |
-| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   2x    |       67.9       |          -          |        -         |
-| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1x    |       64.8       |        62.4         |       64.8       |
-| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   2x    |       65.1       |        63.5         |       66.8       |
+| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   1 / 1x    |       66.8       |          -          |        -         |
+| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   1 / 2x    |       67.9       |          -          |        -         |
+| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   3 / 2x    |       69.1       |          -          |        -         |
+| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1 / 1x    |       64.8       |        62.4         |       64.8       |
+| [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1 / 2x    |       65.1       |        63.5         |       66.8       |
+
+Note: The proposals provided by PointPillars are detected on 1 frame points cloud. The results based on multi-frame 1 stage detector are coming soon.
 
 ## Citation
 
@@ -103,7 +118,8 @@ If you find our paper or repository useful, please consider citing
 ```
 
 ## Acknowledgement
-
+This project draws on the following codebases.
 - [mmdetection3d](https://github.com/open-mmlab/mmdetection3d)
 - [OpenPCDet](https://github.com/open-mmlab/OpenPCDet)
 - [LiDAR_SOT](https://github.com/TuSimple/LiDAR_SOT)
+- [CenterPoint](https://github.com/tianweiy/CenterPoint/blob/master/docs/INSTALL.md)

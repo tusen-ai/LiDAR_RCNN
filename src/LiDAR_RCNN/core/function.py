@@ -33,7 +33,7 @@ def reduce_tensor(inp):
 
 
 def train(cfg, epoch, num_epoch, epoch_iters, base_lr, num_iters, trainloader,
-          optimizer, model, writer_dict, device, final_output_dir):
+          optimizer, scheduler, model, writer_dict, device, final_output_dir):
     # Training
     model.train()
     batch_time = 0
@@ -41,6 +41,7 @@ def train(cfg, epoch, num_epoch, epoch_iters, base_lr, num_iters, trainloader,
     ave_cls_loss = AverageMeter()
     ave_center_loss = AverageMeter()
     ave_size_loss = AverageMeter()
+    ave_heading_loss = AverageMeter()
     ave_heading_loss = AverageMeter()
     cur_iters = epoch * epoch_iters
     writer = writer_dict['writer']
@@ -51,11 +52,11 @@ def train(cfg, epoch, num_epoch, epoch_iters, base_lr, num_iters, trainloader,
     tic = time.time()
     for i_iter, batch in enumerate(trainloader):
         pts, pred_bbox, cls_labels, reg_labels = batch
-        cls_labels = cls_labels.float().to(device)
+        cls_labels = cls_labels.long().to(device)
         reg_labels = reg_labels.float().to(device)
         pred_bbox = pred_bbox.float().to(device)
         pts = pts.float().to(device)
-        loss, cls_loss, center_loss, size_loss, heading_loss = model(
+        loss, cls_loss, center_loss, size_loss, heading_loss, valid_box_num = model(
             pts, pred_bbox, cls_labels, reg_labels)
 
         reduced_loss = reduce_tensor(loss)
@@ -63,6 +64,7 @@ def train(cfg, epoch, num_epoch, epoch_iters, base_lr, num_iters, trainloader,
         reduced_center_loss = reduce_tensor(center_loss)
         reduced_size_loss = reduce_tensor(size_loss)
         reduced_heading_loss = reduce_tensor(heading_loss)
+        reduced_valid_box_num = reduce_tensor(valid_box_num)
 
         ave_loss.update(reduced_loss.item())
         ave_cls_loss.update(reduced_cls_loss.item())
@@ -73,6 +75,8 @@ def train(cfg, epoch, num_epoch, epoch_iters, base_lr, num_iters, trainloader,
         model.zero_grad()
         loss.backward()
         optimizer.step()
+
+        # scheduler.step()
 
         torch.cuda.synchronize()
         # measure elapsed time
@@ -89,9 +93,9 @@ def train(cfg, epoch, num_epoch, epoch_iters, base_lr, num_iters, trainloader,
 
         if i_iter % cfg.PRINT_FREQ == 0 and rank == 0:
             msg = 'Epoch: [{}/{}] Iter:[{}/{}], Time: {:.2f}, ' \
-                  'lr: {:.6f}, Loss: {:.6f}, cls_loss: {:.6f}, center_loss: {:.6f}, size_loss: {:.6f},   heading_loss: {:.6f}' .format(
+                  'lr: {:.6f}, Loss: {:.6f}, cls_loss: {:.6f}, center_loss: {:.6f}, size_loss: {:.6f},   heading_loss: {:.6f}, valid_box_num: {}' .format(
                       epoch, num_epoch, i_iter, epoch_iters,
-                      batch_time / cfg.PRINT_FREQ, lr, ave_loss.average() / world_size, ave_cls_loss.average() / world_size, ave_center_loss.average() / world_size, ave_size_loss.average() / world_size, ave_heading_loss.average() / world_size)
+                      batch_time / cfg.PRINT_FREQ, optimizer.param_groups[0]['lr'], ave_loss.average() / world_size, ave_cls_loss.average() / world_size, ave_center_loss.average() / world_size, ave_size_loss.average() / world_size, ave_heading_loss.average() / world_size, reduced_valid_box_num  / world_size)
             logging.info(msg)
             batch_time = 0
     writer.add_scalar('train_loss', ave_loss.average(), global_steps)

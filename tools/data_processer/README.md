@@ -58,9 +58,10 @@ num_process: 10
 pc_path: /your/path/to/raw point cloud
 data_path: /your/mmdet3d/waymo-car/kitti_results_train.bin
 gt_path: /your/path/to/groud truth info.
-target_path: datasets/mmdet3d_pp
+target_path: datasets/mmdet3d_pp_5_frame
 mode: train
 expand_proposal_meter: 3
+nframe: 5
 ```
 
 ```bash

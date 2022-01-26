@@ -25,7 +25,7 @@ def process_pcd(pcd, proposal, keep_num):
         # move pcd to proposal's center
         pcd[:, 2] -= proposal[2]
         choice = np.random.choice(pcd.shape[0], keep_num, replace=True)
-        point_set = pcd[choice, :3]
+        point_set = pcd[choice, :]
         # transform the points to pred box coordinate
         norm_xy = point_set[:, :2] - np.array([proposal[0], proposal[1]
                                                ]).reshape(1, 2)
@@ -35,8 +35,7 @@ def process_pcd(pcd, proposal, keep_num):
             proposal[[3, 4, 5]] / 2 + point_set[:, :3]
         ])
     else:
-        point_set = np.full((keep_num, 9), 0)
-    point_set = point_set.transpose([1, 0])
+        point_set = np.full((keep_num, 12), 0)
     return point_set
 
 
@@ -54,14 +53,34 @@ def norm_angle(angle):
     return angle
 
 
-def load_data(it):
-    pcd, pcd_ri2, proposal, gt_box, gt_cls = pkl.loads(it['data'])
-    pcd = pcd.astype(np.single)[:, [0, 1, 2]]
-    pcd_ri2 = pcd_ri2.astype(np.single)[:, [0, 1, 2]]
-    pcd = np.vstack([pcd, pcd_ri2])
+def load_data(it, nframe):
+    pcd_ri1_lst, pcd_ri2_lst, proposal, gt_box, gt_cls = pkl.loads(it['data'])
+
+    pcd_cur_ri1 = pcd_ri1_lst[0].astype(np.single)
+    pcd_cur_ri2 = pcd_ri2_lst[0].astype(np.single)
+    pcd_add_ones_ri1 = np.ones((pcd_cur_ri1.shape[0], 2))
+    pcd_add_ones_ri2 = np.ones((pcd_cur_ri2.shape[0], 2))
+    pcd_add_ones_ri1[:, 1] = 0
+    pcd_add_ones_ri2[:, 0] = 0
+    pcd_cur_ri1 = np.hstack([pcd_cur_ri1, pcd_add_ones_ri1])
+    pcd_cur_ri2 = np.hstack([pcd_cur_ri2, pcd_add_ones_ri2])
+    pcd_cur = np.vstack([pcd_cur_ri1, pcd_cur_ri2])
+    if len(pcd_ri1_lst) == 1:
+        pcd_pre = np.zeros((1, pcd_cur.shape[1]))
+    else:
+        pcd_pre_ri1 = np.vstack(pcd_ri1_lst[1:nframe])
+        pcd_pre_ri2 = np.vstack(pcd_ri2_lst[1:nframe])
+        pcd_add_ones_ri1 = np.ones((pcd_pre_ri1.shape[0], 2))
+        pcd_add_ones_ri2 = np.ones((pcd_pre_ri2.shape[0], 2))
+        pcd_add_ones_ri1[:, 1] = 0
+        pcd_add_ones_ri2[:, 0] = 0
+        pcd_pre_ri1 = np.hstack([pcd_pre_ri1, pcd_add_ones_ri1])
+        pcd_pre_ri2 = np.hstack([pcd_pre_ri2, pcd_add_ones_ri2])
+        pcd_pre = np.vstack([pcd_pre_ri1, pcd_pre_ri2])
+
     proposal = proposal.astype(np.single)[:7]
     gt_box = gt_box.astype(np.single)[:7]
-    return pcd, proposal, gt_box, gt_cls
+    return pcd_cur, pcd_pre, proposal, gt_box, gt_cls
 
 
 def relabel_by_iou(proposal, gt_box, gt_cls, thresholds):

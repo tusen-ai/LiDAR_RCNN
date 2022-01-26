@@ -71,6 +71,7 @@ val_dataset = BaseDataset(get_world_size(),
                           index_path,
                           description,
                           points_num=cfg.TEST.NUM_POINTS,
+                          frame=cfg.MODEL.Frame,
                           rank=args.local_rank,
                           valid_cls=cfg.TRAIN.VALID_CLS,
                           train=False)
