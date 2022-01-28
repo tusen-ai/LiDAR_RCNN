@@ -45,7 +45,7 @@ python setup.py develop --user
 Cuda Extensions:
 ```shell
 # Rotated IOU
-cd src/LiDAR_RCNN/ops/
+cd src/LiDAR_RCNN/ops/iou3d/
 python setup.py build_ext --inplace
 ```
 ## Preparing Data
