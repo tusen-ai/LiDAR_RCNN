@@ -91,6 +91,7 @@ Our model achieves the following performance on:
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   1 / 1x    |       75.6       |          -          |        -         |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   1 / 2x    |       75.6       |          -          |        -         |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   3 / 2x    |       77.8       |          -          |        -         |
+| [SST](https://github.com/TuSimple/SST) | Vehicle |   3 / 2x    |       78.6       |          -          |        -         |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1 / 1x    |       73.4       |        70.7         |       67.4       |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1 / 2x    |       73.8       |        71.9         |       69.4       |
 
@@ -99,6 +100,7 @@ Our model achieves the following performance on:
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   1 / 1x    |       66.8       |          -          |        -         |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   1 / 2x    |       67.9       |          -          |        -         |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | Vehicle |   3 / 2x    |       69.1       |          -          |        -         |
+| [SST](https://github.com/TuSimple/SST) | Vehicle |   3 / 2x    |       69.9       |          -          |        -         |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1 / 1x    |       64.8       |        62.4         |       64.8       |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1 / 2x    |       65.1       |        63.5         |       66.8       |
 
