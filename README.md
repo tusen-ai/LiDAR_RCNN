@@ -104,7 +104,7 @@ Our model achieves the following performance on:
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1 / 1x    |       64.8       |        62.4         |       64.8       |
 | [PointPillars](https://github.com/open-mmlab/mmdetection3d/tree/master/configs/pointpillars) | 3 Class |   1 / 2x    |       65.1       |        63.5         |       66.8       |
 
-Note: The proposals provided by PointPillars are detected on 1 frame points cloud. The results based on multi-frame 1 stage detector are coming soon.
+Note: The proposals provided by PointPillars are detected on 1 frame points cloud.
 
 ## Citation
 
