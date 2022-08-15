@@ -18,7 +18,7 @@ ROOT_DIRECTORY
       raw point cloud data.
 ```
 
-After that, you can follow the [Tutorial](https://github.com/open-mmlab/mmdetection3d/blob/master/docs/tutorials/waymo.md) in [mmdet3D](https://github.com/open-mmlab/mmdetection3d) to get proposals for LiDAR R-CNN.  Briefly, we can get proposals in **validation set** by:
+After that, you can follow the [Tutorial]([https://github.com/open-mmlab/mmdetection3d/blob/master/docs/tutorials/waymo.md](https://github.com/open-mmlab/mmdetection3d/blob/v0.13.0/docs/tutorials/waymo.md)) in [mmdet3D(v0.13.0)](https://github.com/open-mmlab/mmdetection3d/tree/v0.13.0) to get proposals for LiDAR R-CNN.  Briefly, we can get proposals in **validation set** by:
 
 ```
 ./tools/dist_test.sh configs/pointpillars/hv_pointpillars_secfpn_sbn_2x16_2x_waymo-3d-car.py checkpoints/hv_pointpillars_secfpn_sbn_2x16_2x_waymo-3d-car-9fa20624.pth 8 --out results/waymo-pp-car/results_eval.pkl \
